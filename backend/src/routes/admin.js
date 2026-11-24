@@ -167,4 +167,27 @@ router.patch("/aportes/:id/estado", async (req, res) => {
   }
 });
 
+
+
+// DELETE /api/admin/aportes/:id — Elimina un aporte y sus ítems asociados
+router.delete("/aportes/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { rows } = await pool.query(
+      "DELETE FROM aportes WHERE id = $1 RETURNING id",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Aporte no encontrado" });
+    }
+
+    res.json({ ok: true, id: rows[0].id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al eliminar aporte" });
+  }
+});
+
 export default router;
